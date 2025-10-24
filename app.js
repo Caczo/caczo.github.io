@@ -39,7 +39,7 @@ class InventoryManagementSystem {
 
     init() {
         this.loadDefaultColumnConfigs();
-        this.loadInitialData();
+        this.loadFromStorage();
         this.bindEvents();
         this.updateAllDisplays();
         this.startAutoSave();
@@ -84,6 +84,39 @@ class InventoryManagementSystem {
             {id: "actions", name: "Действия", type: "actions", visible: true, width: 120}
         ];
     }
+// Добавьте этот метод в класс InventoryManagementSystem
+saveToStorage() {
+    try {
+        const dataToSave = {
+            products: this.data.products,
+            sales: this.data.sales,
+            columnConfigs: this.data.columnConfigs,
+            settings: this.data.settings
+        };
+        localStorage.setItem('inventoryData', JSON.stringify(dataToSave));
+        console.log('✅ Данные сохранены в localStorage');
+    } catch (error) {
+        console.error('❌ Ошибка при сохранении:', error);
+    }
+}
+// Добавьте этот метод в класс InventoryManagementSystem
+loadFromStorage() {
+    try {
+        const savedData = localStorage.getItem('inventoryData');
+        if (savedData) {
+            const parsedData = JSON.parse(savedData);
+            this.data.products = parsedData.products || [];
+            this.data.sales = parsedData.sales || [];
+            this.data.columnConfigs = parsedData.columnConfigs || this.data.columnConfigs;
+            this.data.settings = parsedData.settings || this.data.settings;
+            console.log('✅ Данные загружены из localStorage');
+        } else {
+            console.log('ℹ️ Сохраненных данных не найдено, используем начальные');
+        }
+    } catch (error) {
+        console.error('❌ Ошибка при загрузке:', error);
+    }
+}
 
     loadInitialData() {
         // Load sample data from provided JSON
@@ -155,6 +188,8 @@ class InventoryManagementSystem {
                     "customer": "Оптовый клиент"
                 }
             ]
+            this.saveToStorage(); // ← ДОБАВИТЬ
+            this.updateAllDisplays();
         };
 
         // Convert sample data to internal format
@@ -189,6 +224,8 @@ class InventoryManagementSystem {
         };
 
         this.recalculateInventory();
+        this.saveToStorage(); // ← ДОБАВИТЬ
+    this.updateAllDisplays();
     }
 
     recalculateInventory() {
@@ -223,6 +260,8 @@ class InventoryManagementSystem {
         if (addProductBtn) {
             addProductBtn.addEventListener('click', () => {
                 this.showAddProductForm();
+                this.saveToStorage(); // ← ДОБАВИТЬ
+    this.updateAllDisplays();
             });
         }
 
@@ -231,6 +270,8 @@ class InventoryManagementSystem {
         if (addSaleBtn) {
             addSaleBtn.addEventListener('click', () => {
                 this.showSalesForm();
+                this.saveToStorage(); // ← ДОБАВИТЬ
+    this.updateAllDisplays();
             });
         }
 
@@ -238,6 +279,8 @@ class InventoryManagementSystem {
         if (cancelSaleBtn) {
             cancelSaleBtn.addEventListener('click', () => {
                 this.hideSalesForm();
+                this.saveToStorage(); // ← ДОБАВИТЬ
+    this.updateAllDisplays();
             });
         }
 
@@ -246,6 +289,8 @@ class InventoryManagementSystem {
             salesForm.addEventListener('submit', (e) => {
                 e.preventDefault();
                 this.processSale();
+                this.saveToStorage(); // ← ДОБАВИТЬ
+    this.updateAllDisplays();
             });
         }
 
@@ -344,6 +389,8 @@ class InventoryManagementSystem {
                 resetBtn.addEventListener('click', () => {
                     if (confirm('Сбросить колонки к настройкам по умолчанию?')) {
                         this.resetColumnsToDefault(tableType);
+                        this.saveToStorage(); // ← ДОБАВИТЬ
+    this.updateAllDisplays();
                     }
                 });
             }
@@ -494,6 +541,8 @@ class InventoryManagementSystem {
         this.updateColumnSettings();
         this.updateSettings();
         this.updateGlobalStats();
+        this.saveToStorage(); // ← ДОБАВИТЬ
+        this.updateAllDisplays();
     }
 
     // Column Settings Methods
@@ -528,6 +577,8 @@ class InventoryManagementSystem {
             this.updateColumnsList();
             this.updateTablesBasedOnColumns();
             this.updateTimestamp();
+            this.saveToStorage(); // ← ДОБАВИТЬ
+            this.updateAllDisplays();
         } catch (error) {
             console.error('Error adding column from template:', error);
         }
@@ -570,6 +621,8 @@ class InventoryManagementSystem {
 
         // Add drag and drop functionality
         this.initColumnDragAndDrop(listContainer);
+        this.saveToStorage(); // ← ДОБАВИТЬ
+    this.updateAllDisplays();
     }
 
     initColumnDragAndDrop(container) {
@@ -600,6 +653,8 @@ class InventoryManagementSystem {
                     const draggedId = draggedItem.dataset.columnId;
                     const targetId = item.dataset.columnId;
                     this.reorderColumns(tableType, draggedId, targetId);
+                    this.saveToStorage(); // ← ДОБАВИТЬ
+                    this.updateAllDisplays();
                 }
             });
         });
@@ -617,6 +672,8 @@ class InventoryManagementSystem {
             this.updateColumnsList();
             this.updateTablesBasedOnColumns();
             this.updateTimestamp();
+            this.saveToStorage(); // ← ДОБАВИТЬ
+    this.updateAllDisplays();
         }
     }
 
@@ -626,6 +683,8 @@ class InventoryManagementSystem {
             column.visible = visible;
             this.updateTablesBasedOnColumns();
             this.updateTimestamp();
+            this.saveToStorage(); // ← ДОБАВИТЬ
+            this.updateAllDisplays();
         }
     }
 
@@ -634,6 +693,8 @@ class InventoryManagementSystem {
         if (column) {
             this.editingColumnId = columnId;
             this.showColumnConfigModal(tableType, column);
+            this.saveToStorage(); // ← ДОБАВИТЬ
+            this.updateAllDisplays();
         }
     }
 
@@ -650,6 +711,8 @@ class InventoryManagementSystem {
             this.updateColumnsList();
             this.updateTablesBasedOnColumns();
             this.updateTimestamp();
+            this.saveToStorage(); // ← ДОБАВИТЬ
+            this.updateAllDisplays();
         }
     }
 
@@ -660,6 +723,8 @@ class InventoryManagementSystem {
         this.updateColumnsList();
         this.updateTablesBasedOnColumns();
         this.updateTimestamp();
+        this.saveToStorage(); // ← ДОБАВИТЬ
+        this.updateAllDisplays();
     }
 
     showColumnConfigModal(tableType, column = null) {
@@ -809,6 +874,8 @@ class InventoryManagementSystem {
         this.updateTablesBasedOnColumns();
         this.hideColumnConfigModal();
         this.updateTimestamp();
+        this.saveToStorage(); // ← ДОБАВИТЬ
+    this.updateAllDisplays();
     }
 
     resetColumnsToDefault(tableType) {
@@ -816,6 +883,8 @@ class InventoryManagementSystem {
         this.updateColumnsList();
         this.updateTablesBasedOnColumns();
         this.updateTimestamp();
+        this.saveToStorage(); // ← ДОБАВИТЬ
+    this.updateAllDisplays();
     }
 
     exportColumnConfig() {
@@ -855,6 +924,8 @@ class InventoryManagementSystem {
         this.updateMarginCalculator();
         this.updateInventoryDatabase();
         this.updateSalesLog();
+        this.saveToStorage(); // ← ДОБАВИТЬ
+    this.updateAllDisplays();
     }
 
     generateColumnId() {
@@ -914,6 +985,8 @@ class InventoryManagementSystem {
                 status: this.getStockStatusText(product)
             };
         });
+        this.saveToStorage(); // ← ДОБАВИТЬ
+    this.updateAllDisplays();
     }
 
     updateSalesLog() {
@@ -932,6 +1005,8 @@ class InventoryManagementSystem {
             total_amount: sale.total,
             customer: sale.customer || '—'
         }));
+        this.saveToStorage(); // ← ДОБАВИТЬ
+    this.updateAllDisplays();
     }
 
     renderDynamicTable(tableType, headerElementId, bodyElementId, data, dataMapper) {
@@ -1008,6 +1083,8 @@ class InventoryManagementSystem {
             default:
                 return rawValue;
         }
+        this.saveToStorage(); // ← ДОБАВИТЬ
+    this.updateAllDisplays();
     }
 
     calculateColumnValue(column, data, tableType) {
@@ -1016,6 +1093,8 @@ class InventoryManagementSystem {
         }
         
         return data[column.id] !== undefined ? data[column.id] : '—';
+        this.saveToStorage(); // ← ДОБАВИТЬ
+    this.updateAllDisplays();
     }
 
     evaluateFormula(formula, data, tableType) {
@@ -1220,6 +1299,8 @@ class InventoryManagementSystem {
 
         const todaySalesAmountEl = document.getElementById('today-sales-amount');
         if (todaySalesAmountEl) todaySalesAmountEl.textContent = todayAmount.toFixed(2);
+        this.saveToStorage(); // ← ДОБАВИТЬ
+    this.updateAllDisplays();
     }
 
     updateSalesFormProductSelect() {
@@ -1232,6 +1313,8 @@ class InventoryManagementSystem {
                     ${product.name} (остаток: ${product.currentStock})
                 </option>`
             ).join('');
+        this.saveToStorage(); // ← ДОБАВИТЬ
+    this.updateAllDisplays();
     }
 
     updateSettings() {
@@ -1268,6 +1351,8 @@ class InventoryManagementSystem {
         const dataSize = new Blob([JSON.stringify(this.data)]).size / 1024;
         const dataSizeEl = document.getElementById('data-size');
         if (dataSizeEl) dataSizeEl.textContent = `${dataSize.toFixed(1)} KB`;
+        this.saveToStorage(); // ← ДОБАВИТЬ
+    this.updateAllDisplays();
     }
 
     updateGlobalStats() {
@@ -1315,6 +1400,8 @@ class InventoryManagementSystem {
             marginUsd: marginUsd.toFixed(decimals),
             marginRub: marginRub.toFixed(decimals)
         };
+        this.saveToStorage(); // ← ДОБАВИТЬ
+    this.updateAllDisplays();
     }
 
     getStockStatusClass(product) {
@@ -1361,6 +1448,8 @@ class InventoryManagementSystem {
         this.data.products.push(product);
         this.updateAllDisplays();
         this.updateTimestamp();
+        this.saveToStorage(); // ← ДОБАВИТЬ
+        this.updateAllDisplays();
     }
 
     editProduct(productId) {
@@ -1385,6 +1474,8 @@ class InventoryManagementSystem {
 
         this.updateAllDisplays();
         this.updateTimestamp();
+        this.saveToStorage(); // ← ДОБАВИТЬ
+        this.updateAllDisplays();
     }
 
     deleteProduct(productId) {
@@ -1395,6 +1486,8 @@ class InventoryManagementSystem {
         
         this.updateAllDisplays();
         this.updateTimestamp();
+        this.saveToStorage(); // ← ДОБАВИТЬ
+        this.updateAllDisplays();
     }
 
     showSalesForm() {
@@ -1402,6 +1495,8 @@ class InventoryManagementSystem {
         if (salesFormCard) {
             salesFormCard.classList.remove('hidden');
             this.updateSalesFormProductSelect();
+            this.saveToStorage(); // ← ДОБАВИТЬ
+    this.updateAllDisplays();
         }
     }
 
@@ -1441,6 +1536,8 @@ class InventoryManagementSystem {
             unitPriceInput.value = '';
             if (totalInput) totalInput.value = '';
         }
+        this.saveToStorage(); // ← ДОБАВИТЬ
+    this.updateAllDisplays();
     }
 
     updateSaleTotal() {
@@ -1517,6 +1614,8 @@ class InventoryManagementSystem {
         this.recalculateInventory();
         this.updateAllDisplays();
         this.updateTimestamp();
+        this.saveToStorage(); // ← ДОБАВИТЬ
+        this.updateAllDisplays();
     }
 
     updateExchangeRates() {
@@ -1542,6 +1641,8 @@ class InventoryManagementSystem {
         this.updateAllDisplays();
         this.updateTimestamp();
         alert('Курсы валют обновлены');
+        this.saveToStorage(); // ← ДОБАВИТЬ
+        this.updateAllDisplays();
     }
 
     saveSettings() {
@@ -1564,6 +1665,8 @@ class InventoryManagementSystem {
         this.updateAllDisplays();
         this.updateTimestamp();
         alert('Настройки сохранены');
+        this.saveToStorage(); // ← ДОБАВИТЬ
+        this.updateAllDisplays();
     }
 
     exportAllData() {
@@ -1670,6 +1773,8 @@ class InventoryManagementSystem {
         if (timestampEl) {
             timestampEl.textContent = new Date().toLocaleString('ru-RU');
         }
+        this.saveToStorage(); // ← ДОБАВИТЬ
+    this.updateAllDisplays();
     }
 
     startAutoSave() {
